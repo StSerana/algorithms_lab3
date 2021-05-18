@@ -24,54 +24,48 @@ void GetMatr(int **mas, int **p, int i, int j, int m) {
     }
 }
 
-//Вычисление определителя матрицы
-int Determinant(int** A)
-{
-    int N = sizeof(A) / sizeof(int);
-    int** B = new int*[N];
-    int denom = 1, exchanges = 0;
-    for (int i = 0; i < N; ++i)
-    {
-        B[i] = new int[N];
-        for (int j = 0; j < N; ++j)
-            B[i][j] = A[i][j];
+// Рекурсивное вычисление определителя
+int Determinant(int **mas, int m) {
+    int i, j, d, k, n;
+    int **p;
+    p = new int*[m];
+    for (i = 0; i<m; i++)
+        p[i] = new int[m];
+    j = 0; d = 0;
+    k = 1; //(-1) в степени i
+    n = m - 1;
+    if (m<1){
+        cout << "Определитель вычислить невозможно!" << endl;
+        return 0;
     }
-    for (int i = 0; i < N-1; ++i)
-    { int maxN = i, maxValue = abs(B[i][i]);
-        for (int j = i+1; j < N; ++j)
-        {
-            int value = abs(B[j][i]);
-            if (value > maxValue){ maxN = j; maxValue = value; }
-        }
-        if (maxN > i)
-        {
-            int* t = B[i];
-            B[i] = B[maxN];
-            B[maxN] = t;
-            ++exchanges;
-        }
-        else {
-            if (maxValue == 0) return maxValue;
-        }
-        int value1 = B[i][i];
-        for (int j = i+1; j < N; ++j)
-        {
-            int value2 = B[j][i];
-            B[j][i] = 0;
-            for (int k = i+1; k < N; ++k) B[j][k] = (B[j][k]*value1-B[i][k]*value2)/denom;
-        }
-        denom = value1;
+    if (m == 1) {
+        d = mas[0][0];
+        return(d);
     }
-    if (exchanges%2) return -B[N-1][N-1];
-    else return B[N-1][N-1];
+    if (m == 2) {
+        d = mas[0][0] * mas[1][1] - (mas[1][0] * mas[0][1]);
+        return(d);
+    }
+    if (m>2) {
+        for (i = 0; i<m; i++) {
+            GetMatr(mas, p, i, 0, m);
+            cout << mas[i][j] << endl;
+            PrintMatr(p, n);
+            d = d + k * mas[i][0] * Determinant(p, n);
+            k = -k;
+        }
+    }
+    return(d);
 }
 
 // Получение обратной матрицы
 int** InverseMatrix(int** A, int k)
 {
-    int det = Determinant(A);
-    if (det == 0)
-        cout << "Обратной матрицы не существует";
+    int det = Determinant(A,k);
+    if (det == 0){
+        cout << "Обратной матрицы не существует" << endl;
+        return A;
+    }
     int N = k;
     int** invA = new int*[k];
     for (int i = 0; i < N; i++) {
@@ -101,7 +95,7 @@ int** InverseMatrix(int** A, int k)
                     B[m-1][n-1] = A[m][n];
             }
             try {
-                invA[i][j] = sign * Determinant(B) / det;
+                invA[i][j] = sign * Determinant(B, k - 1) / det;
             }catch (int a){
                 invA[i][j] = 0;
             }
@@ -112,7 +106,7 @@ int** InverseMatrix(int** A, int k)
 }
 
 // Умножение матрицы на вектор
-int* MatrMultiply(int n, int m, int** matrix, int* vektor) // если необходимы целочисленные значения, можно заменить на int
+int* MatrMultiply(int n, int m, int** matrix, int* vektor)
 {
     int* res = new int[n];
     for (int i=0;i<n;i++)
@@ -125,6 +119,11 @@ int* MatrMultiply(int n, int m, int** matrix, int* vektor) // если необ�
         res[i] = temp;
     }
     return res;
+}
+
+//Решение квадратной системы линейных уравнений методом обратной матрицы
+int* solve(){
+
 }
 
 int main() {
@@ -143,10 +142,10 @@ int main() {
         }
     }
     PrintMatr(mas, m);
-    d = Determinant(mas);
+    d = Determinant(mas,m);
     cout << "Определитель матрицы равен " << d << endl;
     cout << "Обратная матрица: " << endl;
-    //PrintMatr(InverseMatrix(mas, m), m);
+    PrintMatr(InverseMatrix(mas, m), m);
     int vectorLength;
     cout << "Введите длину вектора ";
     cin >> vectorLength;
