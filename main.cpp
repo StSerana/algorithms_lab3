@@ -2,7 +2,7 @@
 using namespace std;
 
 // Функция вывода матрицы
-void PrintMatr(int **mas, int m) {
+void PrintMatr(float **mas, int m) {
     int i, j;
     for (i = 0; i<m; i++) {
         for (j = 0; j<m; j++)
@@ -11,7 +11,7 @@ void PrintMatr(int **mas, int m) {
     }
 }
 // Получение матрицы без i-й строки и j-го столбца
-void GetMatr(int **mas, int **p, int i, int j, int m) {
+void GetMatr(float **mas, float **p, int i, int j, int m) {
     int ki, kj, di, dj;
     di = 0;
     for (ki = 0; ki<m - 1; ki++) { // проверка индекса строки
@@ -25,12 +25,12 @@ void GetMatr(int **mas, int **p, int i, int j, int m) {
 }
 
 // Рекурсивное вычисление определителя
-int Determinant(int **mas, int m) {
+int Determinant(float **mas, int m) {
     int i, j, d, k, n;
-    int **p;
-    p = new int*[m];
+    float **p;
+    p = new float*[m];
     for (i = 0; i<m; i++)
-        p[i] = new int[m];
+        p[i] = new float[m];
     j = 0; d = 0;
     k = 1; //(-1) в степени i
     n = m - 1;
@@ -59,7 +59,7 @@ int Determinant(int **mas, int m) {
 }
 
 // Получение обратной матрицы
-int** InverseMatrix(int** A, int k)
+float** InverseMatrix(float** A, int k)
 {
     int det = Determinant(A,k);
     if (det == 0){
@@ -67,20 +67,20 @@ int** InverseMatrix(int** A, int k)
         return A;
     }
     int N = k;
-    int** invA = new int*[k];
+    float** invA = new float*[k];
     for (int i = 0; i < N; i++) {
-        invA[i] = new int[N];
+        invA[i] = new float[N];
     }
     for (int i = 0; i < N; i++)
     {
-        invA[i] = new int[k];
+        invA[i] = new float[k];
         for (int j = 0; j < N; j++)
         {
-            int** B = new int*[j];
+            float** B = new float*[j];
             int sign = ((i+j)%2==0) ? 1 : -1;
             for (int m = 0; m < j; m++)
             {
-                B[m] = new int[j];
+                B[m] = new float[j];
                 for (int n = 0; n < i; n++)
                     B[m][n] = A[m][n];
                 for (int n = i+1; n < N; n++)
@@ -88,14 +88,15 @@ int** InverseMatrix(int** A, int k)
             }
             for (int m = j+1; m < N; m++)
             {
-                B[m-1] = new int [m];
+                B[m-1] = new float[m];
                 for (int n = 0; n < i; n++)
                     B[m-1][n] = A[m][n];
                 for (int n = i+1; n < N; n++)
                     B[m-1][n-1] = A[m][n];
             }
             try {
-                invA[i][j] = sign * Determinant(B, k - 1) / det;
+                int det2 = Determinant(B, k - 1);
+                invA[i][j] = sign * (float)det2 / (float)det;
             }catch (int a){
                 invA[i][j] = 0;
             }
@@ -106,9 +107,9 @@ int** InverseMatrix(int** A, int k)
 }
 
 // Умножение матрицы на вектор
-int* MatrMultiply(int n, int m, int** matrix, int* vektor)
+float* MatrMultiply(int n, int m, float** matrix, int* vektor)
 {
-    int* res = new int[n];
+    float* res = new float[n];
     for (int i=0;i<n;i++)
     {
         int temp = 0;
@@ -128,14 +129,14 @@ int* solve(){
 
 int main() {
     int m, i, j, d;
-    int **mas;
+    float **mas;
     system("chcp 1251");
     system("cls");
     cout << "Введите размерность квадратной матрицы: ";
     cin >> m;
-    mas = new int*[m];
+    mas = new float*[m];
     for (i = 0; i<m; i++) {
-        mas[i] = new int[m];
+        mas[i] = new float[m];
         for (j = 0; j<m; j++) {
             cout << "mas[" << i << "][" << j << "]= ";
             cin >> mas[i][j];
@@ -155,7 +156,7 @@ int main() {
         cin >> vector[k];
     }
     cout << "Умножение матрицы на вектор" << endl;
-    int* result = MatrMultiply(m, vectorLength, mas, vector);
+    float* result = MatrMultiply(m, vectorLength, mas, vector);
     for(int i = 0; i < vectorLength; i++){
         cout << result[i] << " ";
     }
